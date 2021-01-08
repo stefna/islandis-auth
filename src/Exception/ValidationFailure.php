@@ -24,9 +24,9 @@ final class ValidationFailure extends \DomainException implements AuthenticateEr
 		return new self('Key not found');
 	}
 
-	public static function invalidAudience(string $audience): self
+	public static function invalidAudience(string $audience, string $expected): self
 	{
-		return new self(sprintf('Invalid audience "%s"', $audience));
+		return new self(sprintf('Invalid audience expected "%s" got "%s"', $expected, $audience));
 	}
 
 	public static function keyInfoNotFound(): self

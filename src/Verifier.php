@@ -24,9 +24,12 @@ final class Verifier
 	private $trausturBunadurPem;
 	/** @var string */
 	private $audienceUrl;
+	/** @var Clock */
+	private $clock;
 
 	public function __construct(string $audienceUrl, ?string $certificateDir = null)
 	{
+		$this->clock = Clock::live();
 		if ($certificateDir === null) {
 			$certificateDir = $this->getDefaultCertificateFolder();
 		}
@@ -37,6 +40,11 @@ final class Verifier
 			throw CertificateError::notFoundInDirectory($certificateDir);
 		}
 		$this->audienceUrl = $audienceUrl;
+	}
+
+	public function setClock(Clock $clock): void
+	{
+		$this->clock = $clock;
 	}
 
 	protected function getDefaultCertificateFolder(): string
@@ -137,7 +145,7 @@ final class Verifier
 		if (!\is_int($startTime) || !\is_int($endTime)) {
 			throw InvalidResponse::dateInvalid();
 		}
-		$now = time();
+		$now = $this->clock->getTimestamp();
 		$inSpan = $startTime < $now && $now < $endTime;
 		if (!$inSpan) {
 			throw InvalidResponse::notWithinTimeframe();
@@ -167,7 +175,7 @@ final class Verifier
 		date_default_timezone_set('Atlantic/Reykjavik');
 		$dateFrom = (int)$parsed['validFrom_time_t'];
 		$dateTo = (int)$parsed['validTo_time_t'];
-		$nowTime = time();
+		$nowTime = $this->clock->getTimestamp();
 		if ($nowTime < $dateFrom || $nowTime > $dateTo) {
 			throw CertificateError::expired();
 		}
@@ -244,7 +252,7 @@ final class Verifier
 		]);
 
 		if (!$audience || $audience->textContent !== $this->audienceUrl) {
-			throw ValidationFailure::invalidAudience($audience ? $audience->textContent : '');
+			throw ValidationFailure::invalidAudience($audience ? $audience->textContent : '', $this->audienceUrl);
 		}
 
 		return true;
