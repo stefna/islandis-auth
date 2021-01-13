@@ -26,6 +26,8 @@ final class Verifier
 	private $audienceUrl;
 	/** @var Clock */
 	private $clock;
+	/** @var string */
+	private $userAgent;
 
 	public function __construct(string $audienceUrl, ?string $certificateDir = null)
 	{
@@ -47,6 +49,11 @@ final class Verifier
 		$this->clock = $clock;
 	}
 
+	public function setUserAgent(string $agent): void
+	{
+		$this->userAgent = $agent;
+	}
+
 	protected function getDefaultCertificateFolder(): string
 	{
 		return \dirname(__DIR__) . DIRECTORY_SEPARATOR . 'certificates';
@@ -58,8 +65,13 @@ final class Verifier
 			throw new \InvalidArgumentException('Can\'t verify empty token');
 		}
 
+		// Avoid warnings
+		$previous = libxml_use_internal_errors(true);
 		$this->xml = new DOMDocument();
-		$this->xml->loadXML(base64_decode($token));
+		if (!$this->xml->loadXML(base64_decode($token))) {
+			throw XmlError::libXML(libxml_get_last_error());
+		}
+		libxml_use_internal_errors($previous);
 
 		$objXMLSecDSig = new XMLSecurityDSig();
 		$objDSig = $objXMLSecDSig->locateSignature($this->xml);
@@ -218,6 +230,10 @@ final class Verifier
 
 	private function getUserAgent(): string
 	{
+		if ($this->userAgent) {
+			return $this->userAgent;
+		}
+
 		$useragent = '';
 		if (!empty($_SERVER['HTTP_USER_AGENT'])) {
 			$useragent = $_SERVER['HTTP_USER_AGENT'];
@@ -226,9 +242,6 @@ final class Verifier
 		return $useragent;
 	}
 
-	/**
-	 * @param string[] $fields
-	 */
 	private function queryDocument(DOMDocument $doc, array $fields): ?DOMNode
 	{
 		try {
