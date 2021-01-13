@@ -16,7 +16,8 @@
 		"php": "^7.1 || ^8.0",
 		"ext-dom": "*",
 		"ext-openssl": "*",
-		"robrichards/xmlseclibs": "^3.1"
+		"robrichards/xmlseclibs": "^3.1",
+		"phpseclib/phpseclib": "^3.0"
 	},
 	"require-dev": {
 		"phpstan/phpstan": "^0.12.65",

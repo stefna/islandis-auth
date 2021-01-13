@@ -14,9 +14,9 @@ final class CertificateError extends \RuntimeException implements AuthenticateEr
 		return new self('Certificate expired or not valid yet');
 	}
 
-	public static function readError(): self
+	public static function readError(string $msg = null): self
 	{
-		return new self('Failed to read certificate');
+		return new self($msg ?? 'Failed to read certificate');
 	}
 
 	public static function invalidCA(): self

@@ -26,4 +26,9 @@ final class Clock
 	{
 		return $this->fixedTime ?? time();
 	}
+
+	public function getDateTime(): \DateTimeInterface
+	{
+		return new \DateTimeImmutable('@' . ($this->fixedTime ?? time()));
+	}
 }
