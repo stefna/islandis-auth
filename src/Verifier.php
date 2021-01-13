@@ -191,6 +191,13 @@ final class Verifier
 			throw CertificateError::invalidIssuer($issuer);
 		}
 
+		if (!OpenSslX509Verify::verify(
+			$objKeyInfo->getX509Certificate(),
+			file_get_contents($this->trausturBunadurPem)
+		)) {
+			throw CertificateError::invalidIssuer();
+		}
+
 		$subjectKey = $caCertParsed['extensions']['subjectKeyIdentifier'];
 		$authKey = (string)$parsed['extensions']['authorityKeyIdentifier'];
 		/** @var string $authKey */

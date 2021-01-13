@@ -24,9 +24,12 @@ final class CertificateError extends \RuntimeException implements AuthenticateEr
 		return new self('Not correct CA');
 	}
 
-	public static function invalidIssuer(string $issuer): self
+	public static function invalidIssuer(string $issuer = ''): self
 	{
-		return new self('Invalid issuer: "' . $issuer . '"');
+		if ($issuer) {
+			return new self('Invalid issuer: "' . $issuer . '"');
+		}
+		return new self('Invalid issuer');
 	}
 
 	public static function invalidSubject(string $kennitala): self
