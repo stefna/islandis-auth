@@ -19,7 +19,7 @@ https://vefur.island.is/media/pdf-skjol-a-island.is-2014/island.is-ias-services-
 ## Installation
 
 ```
-composer require stefna/islandis
+composer require stefna/islandis-auth
 ```
 
 ## Usage
@@ -40,3 +40,7 @@ if (isset($_POST['token'])) {
 	}
 }
 ```
+
+## Contribute
+
+We are always happy to receive bug/security reports and bug/security fixes
