@@ -29,7 +29,8 @@ composer require stefna/islandis-auth
 ```php
 <?php
 if (isset($_POST['token'])) {
-	$authentication = new Islandis\Authenticate(new \Islandis\Verifier('hostname'));
+	$audienceUrl = 'login.example.com';
+	$authentication = new Islandis\Authenticate(new \Islandis\Verifier($audienceUrl));
 	try {
 		$user = $authentication->verify($_POST['token']);
 		$kennitala = $user->getKennitala();
