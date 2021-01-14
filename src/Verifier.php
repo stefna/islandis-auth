@@ -10,6 +10,7 @@ use Islandis\Exception\CertificateError;
 use Islandis\Exception\InvalidResponse;
 use Islandis\Exception\ValidationFailure;
 use Islandis\Exception\XmlError;
+use phpseclib3\File\X509;
 use RobRichards\XMLSecLibs\XMLSecEnc;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
@@ -167,49 +168,29 @@ final class Verifier
 
 	private function verifyCert(XMLSecurityKey $objKeyInfo): bool
 	{
-		$caFile = file_get_contents($this->trausturBunadurPem);
-		if (!$caFile) {
+		$leaf = new X509();
+		if (!$leaf->loadX509($objKeyInfo->getX509Certificate())) {
 			throw CertificateError::readError();
 		}
-		$caCert = openssl_x509_read($caFile);
-		if (!$caCert) {
+		if (!$leaf->loadCA((string)file_get_contents($this->trausturBunadurPem))) {
 			throw CertificateError::readError();
-		}
-		$caCertParsed = openssl_x509_parse($caCert);
-		if (!$caCertParsed) {
-			throw CertificateError::parseError();
-		}
-		$parsed = openssl_x509_parse($objKeyInfo->getX509Certificate());
-		if (!$parsed) {
-			throw CertificateError::parseError();
 		}
 
 		date_default_timezone_set('Atlantic/Reykjavik');
-		$dateFrom = (int)$parsed['validFrom_time_t'];
-		$dateTo = (int)$parsed['validTo_time_t'];
-		$nowTime = $this->clock->getTimestamp();
-		if ($nowTime < $dateFrom || $nowTime > $dateTo) {
+		if (!$leaf->validateDate($this->clock->getDateTime())) {
 			throw CertificateError::expired();
 		}
 
-		$subject = $parsed['subject']['serialNumber'];
-		$issuer = $parsed['issuer']['CN'];
-
-		if ($subject !== '6503760649') {
-			throw CertificateError::invalidSubject($subject);
+		if ($leaf->getSubjectDNProp('serialNumber')[0] !== '6503760649') {
+			throw CertificateError::invalidSubject($leaf->getSubjectDNProp('serialNumber')[0]);
 		}
 
-		if ($issuer !== 'Traustur bunadur') {
-			throw CertificateError::invalidIssuer($issuer);
+		if ($leaf->getIssuerDNProp('commonName')[0] !== 'Traustur bunadur') {
+			throw CertificateError::invalidIssuer($leaf->getIssuerDNProp('commonName')[0] ?? '');
 		}
 
-		$subjectKey = $caCertParsed['extensions']['subjectKeyIdentifier'];
-		$authKey = (string)$parsed['extensions']['authorityKeyIdentifier'];
-		/** @var string $authKey */
-		$authKey = str_replace('keyid:', '', $authKey);
-
-		if (!strcasecmp($subjectKey, $authKey) || $subjectKey === null) {
-			throw CertificateError::invalidCA();
+		if (!$leaf->validateSignature()) {
+			throw CertificateError::signatureInvalid();
 		}
 
 		return true;
