@@ -10,9 +10,8 @@ env:
 jobs:
   tests:
     name: "CI"
-
     runs-on: ubuntu-latest
-
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         php-version:
@@ -21,7 +20,12 @@ jobs:
           - "7.3"
           - "7.4"
           - "8.0"
-          - "8.1"
+        experimental:
+          - false
+        include:
+          - php: "8.1"
+            COMPOSER_FLAGS: "--ansi --no-interaction --no-progress --prefer-dist --ignore-platform-reqs"
+            experimental: true
 
     steps:
       - name: "Checkout"
