@@ -242,6 +242,9 @@ final class Verifier
 		return $useragent;
 	}
 
+	/**
+	 * @param string[] $fields
+	 */
 	private function queryDocument(DOMDocument $doc, array $fields): ?DOMNode
 	{
 		try {
