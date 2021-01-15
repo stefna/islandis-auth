@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0]
+
 ### Changed
 - Improvements to documentation
+- Major refactor of code to make it more secure
 
 ## [1.1.0]
 
@@ -27,5 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Import code to project and release
 
-[Unreleased]: https://github.com/stefnadev/islandis-auth/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/stefnadev/islandis-auth/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/stefnadev/islandis-auth/releases/tag/1.2.0
+[1.1.0]: https://github.com/stefnadev/islandis-auth/releases/tag/1.1.0
 [1.0.0]: https://github.com/stefnadev/islandis-auth/releases/tag/1.0.0
