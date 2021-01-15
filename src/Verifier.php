@@ -29,6 +29,12 @@ final class Verifier
 	private $clock;
 	/** @var string */
 	private $userAgent;
+	/** @var XMLSecurityKey|null */
+	private $objKeyInfo;
+	/** @var XMLSecurityDSig */
+	private $objXMLSecDSig;
+	/** @var DOMNode */
+	private $objDSig;
 
 	public function __construct(string $audienceUrl, ?string $certificateDir = null)
 	{
@@ -55,17 +61,42 @@ final class Verifier
 		$this->userAgent = $agent;
 	}
 
-	protected function getDefaultCertificateFolder(): string
-	{
-		return \dirname(__DIR__) . DIRECTORY_SEPARATOR . 'certificates';
-	}
-
 	public function verify(string $token): bool
 	{
 		if (!$token) {
 			throw new \InvalidArgumentException('Can\'t verify empty token');
 		}
 
+		$this->loadXml($token);
+
+		$this->verifyDate();
+		$this->verifyAudience();
+		$this->verifyUserAgent();
+		$this->verifyReference();
+		$this->verifySignature();
+		$this->verifyCertificate();
+
+		return true;
+	}
+
+	public function getAttribute(string $needle): ?string
+	{
+		$node = $this->queryDocument([
+			'/assertion:Assertion',
+			'//assertion:Attribute[@FriendlyName="' . $needle . '"]',
+			'/assertion:AttributeValue',
+		]);
+
+		return $node ? $node->nodeValue : null;
+	}
+
+	private function getDefaultCertificateFolder(): string
+	{
+		return \dirname(__DIR__) . DIRECTORY_SEPARATOR . 'certificates';
+	}
+
+	private function loadXml(string $token): void
+	{
 		// Avoid warnings
 		$previous = libxml_use_internal_errors(true);
 		$this->xml = new DOMDocument();
@@ -73,75 +104,34 @@ final class Verifier
 			throw XmlError::libXML(libxml_get_last_error());
 		}
 		libxml_use_internal_errors($previous);
-
-		$objXMLSecDSig = new XMLSecurityDSig();
-		$objDSig = $objXMLSecDSig->locateSignature($this->xml);
-
-		if ($objDSig === null) {
-			throw XmlError::missingSignature();
-		}
-
-		$objXMLSecDSig->canonicalizeSignedInfo();
-		$objXMLSecDSig->idKeys = ['ID'];
-		$objXMLSecDSig->idNS = [
-			'wsu' => 'http://docs.oasisopen.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd',
-		];
-		try {
-			$objXMLSecDSig->validateReference();
-		}
-		catch (\Exception $e) {
-			throw ValidationFailure::reference($e);
-		}
-
-		$this->verifyAudience($this->xml);
-		$this->verifyDate($this->xml);
-
-		$objKey = $objXMLSecDSig->locateKey();
-		if (!$objKey) {
-			throw ValidationFailure::keyNotFound();
-		}
-		$key = null;
-		$objKeyInfo = XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
-		if (!$objKeyInfo) {
-			throw ValidationFailure::keyInfoNotFound();
-		}
-
-		$this->verifyCert($objKeyInfo);
-
-		if (!$objKeyInfo->key && empty($key)) {
-			$objKey->loadKey($this->myCertPem, true);
-		}
-		if (!$objXMLSecDSig->verify($objKey)) {
-			throw CertificateError::signatureInvalid();
-		}
-
-		$this->checkUserAgent($this->xml, $this->getUserAgent());
-
-		return true;
 	}
 
-	public function getAttribute(string $needle): ?string
+	private function getUserAgent(): string
 	{
-		if (!$this->xml) {
-			throw XmlError::notLoaded();
+		if ($this->userAgent) {
+			return $this->userAgent;
 		}
 
-		$searchNode = $this->xml->getElementsByTagName('Attribute');
-		/** @var \DOMElement $attribute */
-		foreach ($searchNode as $attribute) {
-			$friendly = $attribute->getAttribute('FriendlyName');
-			if ($friendly === $needle) {
-				return $attribute->nodeValue;
-			}
+		$useragent = '';
+		if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+			$useragent = $_SERVER['HTTP_USER_AGENT'];
 		}
 
-		return null;
+		return $useragent;
 	}
 
-	private function verifyDate(DOMDocument $doc): bool
+	private function verifyUserAgent(): void
+	{
+		// todo throw on missing useragent
+		if ($this->getAttribute('NotandaStrengur') !== $this->getUserAgent()) {
+			throw ValidationFailure::userAgent();
+		}
+	}
+
+	private function verifyDate(): bool
 	{
 		/** @var \DOMElement|null $conditions */
-		$conditions = $this->queryDocument($doc, ['/assertion:Assertion', '/assertion:Conditions']);
+		$conditions = $this->queryDocument(['/assertion:Assertion', '/assertion:Conditions']);
 		if (!$conditions) {
 			throw InvalidResponse::missingData('Conditions');
 		}
@@ -166,10 +156,13 @@ final class Verifier
 		return true;
 	}
 
-	private function verifyCert(XMLSecurityKey $objKeyInfo): bool
+	private function verifyCertificate(): bool
 	{
+		if (!$this->objKeyInfo) {
+			throw ValidationFailure::keyInfoNotFound();
+		}
 		$leaf = new X509();
-		if (!$leaf->loadX509($objKeyInfo->getX509Certificate())) {
+		if (!$leaf->loadX509($this->objKeyInfo->getX509Certificate())) {
 			throw CertificateError::readError();
 		}
 		if (!$leaf->loadCA((string)file_get_contents($this->trausturBunadurPem))) {
@@ -196,52 +189,9 @@ final class Verifier
 		return true;
 	}
 
-	private function checkUserAgent(DOMDocument $xmlDoc, string $ua): void
+	private function verifyAudience(): bool
 	{
-		if ($xmlDoc !== null) {
-			$searchNode = $xmlDoc->getElementsByTagName('Attribute');
-			foreach ($searchNode as $attribute) {
-				$friendly = $attribute->getAttribute('FriendlyName');
-				if (($friendly === 'NotandaStrengur') && $attribute->nodeValue !== $ua) {
-					throw ValidationFailure::userAgent();
-				}
-			}
-		}
-	}
-
-	private function getUserAgent(): string
-	{
-		if ($this->userAgent) {
-			return $this->userAgent;
-		}
-
-		$useragent = '';
-		if (!empty($_SERVER['HTTP_USER_AGENT'])) {
-			$useragent = $_SERVER['HTTP_USER_AGENT'];
-		}
-
-		return $useragent;
-	}
-
-	/**
-	 * @param string[] $fields
-	 */
-	private function queryDocument(DOMDocument $doc, array $fields): ?DOMNode
-	{
-		try {
-			$xpath = new DOMXPath($doc);
-			$xpath->registerNamespace('assertion', 'urn:oasis:names:tc:SAML:2.0:assertion');
-			$nodeset = $xpath->query('./' . implode('', $fields), $doc);
-			return $nodeset ? $nodeset->item(0) : null;
-		}
-		catch (Exception $e) {
-			throw XmlError::unknown($e);
-		}
-	}
-
-	private function verifyAudience(DOMDocument $doc): bool
-	{
-		$audience = $this->queryDocument($doc, [
+		$audience = $this->queryDocument([
 			'/assertion:Assertion',
 			'/assertion:Conditions',
 			'/assertion:AudienceRestriction',
@@ -253,5 +203,73 @@ final class Verifier
 		}
 
 		return true;
+	}
+
+	private function verifySignature(): void
+	{
+		$objKey = $this->objXMLSecDSig->locateKey();
+		if (!$objKey) {
+			throw ValidationFailure::keyNotFound();
+		}
+		$key = null;
+		$this->objKeyInfo = XMLSecEnc::staticLocateKeyInfo($objKey, $this->objDSig);
+		if (!$this->objKeyInfo) {
+			throw ValidationFailure::keyInfoNotFound();
+		}
+		if (!$this->objKeyInfo->key && empty($key)) {
+			$objKey->loadKey($this->myCertPem, true);
+		}
+		if (!$this->objXMLSecDSig->verify($objKey)) {
+			throw CertificateError::signatureInvalid();
+		}
+	}
+
+	private function verifyReference(): void
+	{
+		if (!$this->xml) {
+			throw XmlError::notLoaded();
+		}
+
+		$objXMLSecDSig = new XMLSecurityDSig();
+		$objDSig = $objXMLSecDSig->locateSignature($this->xml);
+
+		if ($objDSig === null) {
+			throw XmlError::missingSignature();
+		}
+
+		$objXMLSecDSig->canonicalizeSignedInfo();
+		$objXMLSecDSig->idKeys = ['ID'];
+		$objXMLSecDSig->idNS = [
+			'wsu' => 'http://docs.oasisopen.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd',
+		];
+		try {
+			$objXMLSecDSig->validateReference();
+
+			$this->objXMLSecDSig = $objXMLSecDSig;
+			$this->objDSig = $objDSig;
+		}
+		catch (\Exception $e) {
+			throw ValidationFailure::reference($e);
+		}
+	}
+
+	/**
+	 * @param string[] $fields
+	 */
+	private function queryDocument(array $fields): ?DOMNode
+	{
+		if (!$this->xml) {
+			throw XmlError::notLoaded();
+		}
+
+		try {
+			$xpath = new DOMXPath($this->xml);
+			$xpath->registerNamespace('assertion', 'urn:oasis:names:tc:SAML:2.0:assertion');
+			$nodeset = $xpath->query('./' . implode('', $fields), $this->xml);
+			return $nodeset ? $nodeset->item(0) : null;
+		}
+		catch (Exception $e) {
+			throw XmlError::unknown($e);
+		}
 	}
 }

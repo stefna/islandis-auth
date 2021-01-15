@@ -44,6 +44,7 @@ final class TestVerifier extends TestCase
 		$this->expectExceptionMessage('Invalid audience expected "audience" got "login.advania.is"');
 
 		$verifier = new Verifier('audience');
+		$verifier->setClock(Clock::fixed('2014-01-17T15:16:52.1745763Z'));
 		$verifier->verify(base64_encode(file_get_contents(__DIR__ . '/resources/response.xml')));
 	}
 
