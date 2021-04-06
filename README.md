@@ -2,7 +2,7 @@
 
 Library to make it easier to handle logging in with island.is
 
-To get started with Island.is Identification and Authentication Services (IAS) you'll need to apply: vefur.island.is/innskraningarthjonusta/um/.
+To get started with Island.is Identification and Authentication Services (IAS) you'll need to apply: https://island.is/innskraningarthjonusta.
 
 
 ## How it works
