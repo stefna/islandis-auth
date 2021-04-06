@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="_1d62ec4e-ef50-4ca0-ad65-805a126a5e99"
+		  Version="2.0" IssueInstant="2014-01-17T15:15:52.1725761Z"
+		  Destination="https://login.advania.is/islogin.aspx"
+		  xmlns="urn:oasis:names:tc:SAML:2.0:protocol">
+	<Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion">Þjóðskrá Íslands</Issuer>
+	<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<SignedInfo>
+			<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+			<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+			<Reference URI="#_1d62ec4e-ef50-4ca0-ad65-805a126a5e99">
+				<Transforms>
+					<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+					<Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+				</Transforms>
+				<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+				<DigestValue>dg6gseRzXdlH7AEGVKdEP+pkcy14z5XgXEMl9BZEM+A=</DigestValue>
+			</Reference>
+		</SignedInfo>
+		<SignatureValue>HnFClmDhLmjG/RBeiFiG2XsIB5jhRAAXmAcNKp+uDYnLvwZWYvUAZg3pkOZ9vjy2hpQ8LKY+/ArXrwL+p6whw8yaHnbvIY9R95GrMhGle5QyDQ9RJB7DvUm4l1Vo/taR4NeB5Y/vpUuaelqeFsz5DY7IzfyfBSkSuydXIPCj d769uI5Jkpg5O3AhWZ5oS3YjP5bU2ghvgm4lUTckYll5u1OgKGlS/woksl2WrlUcvAw0CFnsz4nlN7HM5DMJ15VMQ96hvhaGBQiVgf5ZeYXkwFrZjl3P1rVbnp7CQ4pKTsgwj8eE5Canz0ejdeatIpCMdPh1SzbIlIKCmlu2NtrSrg==</SignatureValue>
+		<KeyInfo>
+			<X509Data>
+				<X509Certificate>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</X509Certificate>
+			</X509Data>
+		</KeyInfo>
+		<Response xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				  xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="_1d62ec4e-ef50-4ca0-ad65-805a126a5e99"
+				  Version="2.0" IssueInstant="2014-01-17T15:15:52.1725761Z"
+				  Destination="https://login.advania.is/islogin.aspx"
+				  xmlns="urn:oasis:names:tc:SAML:2.0:protocol">
+			<Assertion Version="2.0" ID="_321427d1-3a6c-4d56-9ada-8d90924f6014" IssueInstant="2016-01-17T15:15:52.1725761Z" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
+				<Issuer>Þjóðskrá Íslands</Issuer>
+				<Subject>
+					<NameID NameQualifier="island.is">Innskráningarþjónusta</NameID>
+					<SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+						<SubjectConfirmationData Address="127.0.0.1" NotOnOrAfter="2016-01-17T15:25:52.1745763Z" Recipient="http://localhost:63841/GetBack.aspx"/>
+					</SubjectConfirmation>
+				</Subject>
+				<Conditions NotBefore="2016-01-17T15:15:52.1745763Z" NotOnOrAfter="2016-01-17T15:25:52.1745763Z">
+					<AudienceRestriction>
+						<Audience>wrong.test.is</Audience>
+					</AudienceRestriction>
+				</Conditions>
+				<AuthnStatement AuthnInstant="2016-01-17T15:15:52.1725761Z">
+					<SubjectLocality Address="212.30.225.139"/>
+					<AuthnContext>
+						<AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient</AuthnContextClassRef>
+					</AuthnContext>
+				</AuthnStatement>
+				<AttributeStatement>
+					<Attribute Name="UserSSN" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Kennitala">
+						<AttributeValue xsi:type="xsd:string">1234567890</AttributeValue>
+					</Attribute>
+					<Attribute Name="Name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Nafn">
+						<AttributeValue xsi:type="xsd:string">Jón Jónsson</AttributeValue>
+					</Attribute>
+					<Attribute Name="Authentication" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Auðkenning">
+						<AttributeValue xsi:type="xsd:string">Rafræn skilríki</AttributeValue>
+					</Attribute>
+					<Attribute Name="IPAddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="IPTala">
+						<AttributeValue xsi:type="xsd:string">127.0.0.1</AttributeValue>
+					</Attribute>
+					<Attribute Name="UserAgent" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="NotandaStrengur">
+						<AttributeValue xsi:type="xsd:string">Mozilla/5.0 (Windows NT6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0</AttributeValue>
+					</Attribute>
+					<Attribute Name="AuthID" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="AuðkenningarNúmer">
+						<AttributeValue xsi:type="xsd:string">0807DA8D-3299-4FF4-BEB2-54727A50FFBD</AttributeValue>
+					</Attribute>
+					<Attribute Name="DestinationSSN" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="KennitalaMóttakanda">
+						<AttributeValue xsi:type="xsd:string">5902697199</AttributeValue>
+					</Attribute>
+				</AttributeStatement>
+			</Assertion>
+		</Response>
+	</Signature>
+	<Status>
+		<StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+	</Status>
+	<Assertion Version="2.0" ID="_321427d1-3a6c-4d56-9ada-8d90924f6014" IssueInstant="2014-01-17T15:15:52.1725761Z" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
+		<Issuer>Þjóðskrá Íslands</Issuer>
+		<Subject>
+			<NameID NameQualifier="island.is">Innskráningarþjónusta</NameID>
+			<SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+				<SubjectConfirmationData Address="127.0.0.1" NotOnOrAfter="2014-01-17T15:25:52.1745763Z" Recipient="http://localhost:63841/GetBack.aspx"/>
+			</SubjectConfirmation>
+		</Subject>
+		<Conditions NotBefore="2014-01-17T15:15:52.1745763Z" NotOnOrAfter="2014-01-17T15:25:52.1745763Z">
+			<AudienceRestriction>
+				<Audience>login.advania.is</Audience>
+			</AudienceRestriction>
+		</Conditions>
+		<AuthnStatement AuthnInstant="2014-01-17T15:15:52.1725761Z">
+			<SubjectLocality Address="212.30.225.139"/>
+			<AuthnContext>
+				<AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient</AuthnContextClassRef>
+			</AuthnContext>
+		</AuthnStatement>
+		<AttributeStatement>
+			<Attribute Name="UserSSN" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Kennitala">
+				<AttributeValue xsi:type="xsd:string">1234567890</AttributeValue>
+			</Attribute>
+			<Attribute Name="Name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Nafn">
+				<AttributeValue xsi:type="xsd:string">Jón Jónsson</AttributeValue>
+			</Attribute>
+			<Attribute Name="Authentication" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Auðkenning">
+				<AttributeValue xsi:type="xsd:string">Rafræn skilríki</AttributeValue>
+			</Attribute>
+			<Attribute Name="IPAddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="IPTala">
+				<AttributeValue xsi:type="xsd:string">127.0.0.1</AttributeValue>
+			</Attribute>
+			<Attribute Name="UserAgent" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="NotandaStrengur">
+				<AttributeValue xsi:type="xsd:string">Mozilla/5.0 (Windows NT6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0</AttributeValue>
+			</Attribute>
+			<Attribute Name="AuthID" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="AuðkenningarNúmer">
+				<AttributeValue xsi:type="xsd:string">0807DA8D-3299-4FF4-BEB2-54727A50FFBD</AttributeValue>
+			</Attribute>
+			<Attribute Name="DestinationSSN" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="KennitalaMóttakanda">
+				<AttributeValue xsi:type="xsd:string">5902697199</AttributeValue>
+			</Attribute>
+		</AttributeStatement>
+	</Assertion>
+</Response>
