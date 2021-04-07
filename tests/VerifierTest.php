@@ -10,7 +10,7 @@ use Islandis\Exception\XmlError;
 use Islandis\Verifier;
 use PHPUnit\Framework\TestCase;
 
-final class TestVerifier extends TestCase
+final class VerifierTest extends TestCase
 {
 	public function testEmptyToken(): void
 	{
@@ -74,5 +74,22 @@ final class TestVerifier extends TestCase
 		$token = base64_encode(file_get_contents(__DIR__ . '/resources/valid_response.xml'));
 
 		self::assertTrue($verifier->verify($token));
+	}
+
+	public function testXmlWrapping(): void
+	{
+		self::expectException(CertificateError::class);
+
+		$audienceUrl = 'login.advania.is';
+		$clock = Clock::fixed('2014-01-17T15:20:22.7537164Z');
+		$userAgent = 'Mozilla/5.0 (Windows NT6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0';
+
+		$verifier = new Verifier($audienceUrl);
+		$verifier->setClock($clock);
+		$verifier->setUserAgent($userAgent);
+
+		$token = base64_encode(file_get_contents(__DIR__ . '/resources/response-wrapping.xml'));
+
+		$verifier->verify($token);
 	}
 }

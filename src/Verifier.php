@@ -82,6 +82,7 @@ final class Verifier
 	public function getAttribute(string $needle): ?string
 	{
 		$node = $this->queryDocument([
+			'/protocol:Response',
 			'/assertion:Assertion',
 			'//assertion:Attribute[@FriendlyName="' . $needle . '"]',
 			'/assertion:AttributeValue',
@@ -131,7 +132,7 @@ final class Verifier
 	private function verifyDate(): bool
 	{
 		/** @var \DOMElement|null $conditions */
-		$conditions = $this->queryDocument(['/assertion:Assertion', '/assertion:Conditions']);
+		$conditions = $this->queryDocument(['/protocol:Response', '/assertion:Assertion', '/assertion:Conditions']);
 		if (!$conditions) {
 			throw InvalidResponse::missingData('Conditions');
 		}
@@ -192,6 +193,7 @@ final class Verifier
 	private function verifyAudience(): bool
 	{
 		$audience = $this->queryDocument([
+			'/protocol:Response',
 			'/assertion:Assertion',
 			'/assertion:Conditions',
 			'/assertion:AudienceRestriction',
@@ -229,7 +231,6 @@ final class Verifier
 		if (!$this->xml) {
 			throw XmlError::notLoaded();
 		}
-
 		$objXMLSecDSig = new XMLSecurityDSig();
 		$objDSig = $objXMLSecDSig->locateSignature($this->xml);
 
@@ -265,7 +266,8 @@ final class Verifier
 		try {
 			$xpath = new DOMXPath($this->xml);
 			$xpath->registerNamespace('assertion', 'urn:oasis:names:tc:SAML:2.0:assertion');
-			$nodeset = $xpath->query('./' . implode('', $fields), $this->xml);
+			$xpath->registerNamespace('protocol', 'urn:oasis:names:tc:SAML:2.0:protocol');
+			$nodeset = $xpath->query(implode('', $fields), $this->xml);
 			return $nodeset ? $nodeset->item(0) : null;
 		}
 		catch (Exception $e) {
