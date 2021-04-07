@@ -10,7 +10,7 @@ use Islandis\Exception\XmlError;
 use Islandis\Verifier;
 use PHPUnit\Framework\TestCase;
 
-final class TestVerifier extends TestCase
+final class VerifierTest extends TestCase
 {
 	public function testEmptyToken(): void
 	{
