@@ -18,6 +18,10 @@ class User
 	private $legalEntitySsn;
 	/** @var string */
 	private $legalEntityName;
+	/** @var string */
+	private $destinationSsn;
+	/** @var string */
+	private $authId;
 
 	public static function fromVerifier(Verifier $verifier): self
 	{
@@ -29,6 +33,8 @@ class User
 			(string)$verifier->getAttribute('UserAgent'),
 			(string)$verifier->getAttribute('CompanySSN'),
 			(string)$verifier->getAttribute('CompanyName'),
+			(string)$verifier->getAttribute('DestinationSSN'),
+			(string)$verifier->getAttribute('AuthID')
 		);
 	}
 
@@ -39,7 +45,9 @@ class User
 		string $ip,
 		string $ua,
 		string $legalEntitySsn,
-		string $legalEntityName
+		string $legalEntityName,
+		string $destinationSsn,
+		string $authId
 	) {
 		$this->name = $name;
 		$this->ssn = $ssn;
@@ -48,6 +56,8 @@ class User
 		$this->ua = $ua;
 		$this->legalEntitySsn = $legalEntitySsn;
 		$this->legalEntityName = $legalEntityName;
+		$this->destinationSsn = $destinationSsn;
+		$this->authId = $authId;
 	}
 
 	public function getName(): string
@@ -83,5 +93,15 @@ class User
 	public function getLegalEntityName(): string
 	{
 		return $this->legalEntityName;
+	}
+
+	public function getDestinationSsn(): string
+	{
+		return $this->destinationSsn;
+	}
+
+	public function getAuthId(): string
+	{
+		return $this->authId;
 	}
 }
