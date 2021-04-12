@@ -84,7 +84,7 @@ final class Verifier
 		$node = $this->queryDocument([
 			'/protocol:Response',
 			'/assertion:Assertion',
-			'//assertion:Attribute[@FriendlyName="' . $needle . '"]',
+			'//assertion:Attribute[@Name="' . $needle . '"]',
 			'/assertion:AttributeValue',
 		]);
 
@@ -124,7 +124,7 @@ final class Verifier
 	private function verifyUserAgent(): void
 	{
 		// todo throw on missing useragent
-		if ($this->getAttribute('NotandaStrengur') !== $this->getUserAgent()) {
+		if ($this->getAttribute('UserAgent') !== $this->getUserAgent()) {
 			throw ValidationFailure::userAgent();
 		}
 	}

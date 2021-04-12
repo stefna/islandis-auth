@@ -22,13 +22,13 @@ class User
 	public static function fromVerifier(Verifier $verifier): self
 	{
 		return new self(
-			(string)$verifier->getAttribute('Nafn'),
-			(string)$verifier->getAttribute('Kennitala'),
-			(string)$verifier->getAttribute('Auðkenning'),
-			(string)$verifier->getAttribute('IPTala'),
-			(string)$verifier->getAttribute('NotandaStrengur'),
-			(string)$verifier->getAttribute('KennitalaLögaðila'),
-			(string)$verifier->getAttribute('NafnLögaðila')
+			(string)$verifier->getAttribute('Name'),
+			(string)$verifier->getAttribute('UserSSN'),
+			(string)$verifier->getAttribute('Authentication'),
+			(string)$verifier->getAttribute('IPAddress'),
+			(string)$verifier->getAttribute('UserAgent'),
+			(string)$verifier->getAttribute('CompanySSN'),
+			(string)$verifier->getAttribute('CompanyName'),
 		);
 	}
 
