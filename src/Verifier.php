@@ -17,6 +17,7 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 final class Verifier
 {
+	const INTERMEDIATE_COMMON_NAME = 'Fullgilt audkenni';
 	/** @var DOMDocument|null */
 	private $xml;
 	/** @var string */
@@ -179,7 +180,7 @@ final class Verifier
 			throw CertificateError::invalidSubject($leaf->getSubjectDNProp('serialNumber')[0]);
 		}
 
-		if ($leaf->getIssuerDNProp('commonName')[0] !== 'Fullgilt audkenni') {
+		if ($leaf->getIssuerDNProp('commonName')[0] !== self::INTERMEDIATE_COMMON_NAME) {
 			throw CertificateError::invalidIssuer($leaf->getIssuerDNProp('commonName')[0] ?? '');
 		}
 
