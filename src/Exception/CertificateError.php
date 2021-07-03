@@ -6,7 +6,7 @@ final class CertificateError extends \RuntimeException implements AuthenticateEr
 {
 	public static function notFoundInDirectory(string $dir): self
 	{
-		return new self('Cannot find TrausturBunadur.pem in ' . $dir);
+		return new self('Cannot find Milliskilriki.cer in ' . $dir);
 	}
 
 	public static function expired(): self
