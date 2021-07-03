@@ -22,7 +22,7 @@ final class Verifier
 	/** @var string */
 	private $myCertPem;
 	/** @var string */
-	private $trausturBunadurPem;
+	private $intermediateCert;
 	/** @var string */
 	private $audienceUrl;
 	/** @var Clock */
@@ -43,9 +43,9 @@ final class Verifier
 			$certificateDir = $this->getDefaultCertificateFolder();
 		}
 		$this->myCertPem = $certificateDir . DIRECTORY_SEPARATOR . 'mycert.pem';
-		$this->trausturBunadurPem = $certificateDir . DIRECTORY_SEPARATOR . 'Traustur_bunadur.pem';
+		$this->intermediateCert = $certificateDir . DIRECTORY_SEPARATOR . 'Milliskilriki.cer';
 
-		if (!file_exists($this->trausturBunadurPem)) {
+		if (!file_exists($this->intermediateCert)) {
 			throw CertificateError::notFoundInDirectory($certificateDir);
 		}
 		$this->audienceUrl = $audienceUrl;
@@ -166,7 +166,7 @@ final class Verifier
 		if (!$leaf->loadX509($this->objKeyInfo->getX509Certificate())) {
 			throw CertificateError::readError();
 		}
-		if (!$leaf->loadCA((string)file_get_contents($this->trausturBunadurPem))) {
+		if (!$leaf->loadCA((string)file_get_contents($this->intermediateCert))) {
 			throw CertificateError::readError();
 		}
 
@@ -179,7 +179,7 @@ final class Verifier
 			throw CertificateError::invalidSubject($leaf->getSubjectDNProp('serialNumber')[0]);
 		}
 
-		if ($leaf->getIssuerDNProp('commonName')[0] !== 'Traustur bunadur') {
+		if ($leaf->getIssuerDNProp('commonName')[0] !== 'Fullgilt audkenni') {
 			throw CertificateError::invalidIssuer($leaf->getIssuerDNProp('commonName')[0] ?? '');
 		}
 
