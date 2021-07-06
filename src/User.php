@@ -37,7 +37,7 @@ class User
 			(string)$verifier->getAttribute('CompanyName'),
 			(string)$verifier->getAttribute('DestinationSSN'),
 			(string)$verifier->getAttribute('AuthID'),
-			(string)$verifier->getAttribute('Mobile'),
+			(string)$verifier->getAttribute('Mobile')
 		);
 	}
 
