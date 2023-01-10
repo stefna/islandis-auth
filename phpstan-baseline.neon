@@ -1,0 +1,16 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Cannot access offset 0 on mixed\\.$#"
+			count: 4
+			path: src/Verifier.php
+
+		-
+			message: "#^Parameter \\#1 \\$issuer of static method Islandis\\\\Exception\\\\CertificateError\\:\\:invalidIssuer\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/Verifier.php
+
+		-
+			message: "#^Parameter \\#1 \\$kennitala of static method Islandis\\\\Exception\\\\CertificateError\\:\\:invalidSubject\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/Verifier.php

@@ -14,7 +14,7 @@ final class VerifierTest extends TestCase
 {
 	public function testEmptyToken(): void
 	{
-		$verifier = new Verifier('audience');
+		$verifier = new Verifier('audience', FrozenClock::live());
 
 		$this->expectException(\InvalidArgumentException::class);
 
@@ -27,7 +27,7 @@ final class VerifierTest extends TestCase
 
 		$token = 'test';
 
-		$verifier = new Verifier('audience');
+		$verifier = new Verifier('audience', FrozenClock::live());
 		$verifier->verify($token);
 	}
 
@@ -35,7 +35,7 @@ final class VerifierTest extends TestCase
 	{
 		$this->expectException(CertificateError::class);
 
-		new Verifier('audience', 'resources');
+		new Verifier('audience', FrozenClock::live(), 'resources');
 	}
 
 	public function testInvalidAudience(): void
@@ -43,8 +43,9 @@ final class VerifierTest extends TestCase
 		$this->expectException(ValidationFailure::class);
 		$this->expectExceptionMessage('Invalid audience expected "audience" got "login.advania.is"');
 
-		$verifier = new Verifier('audience');
-		$verifier->setClock(Clock::fixed('2014-01-17T15:16:52.1745763Z'));
+		$verifier = new Verifier('audience', new FrozenClock(new \DateTimeImmutable(
+			'2014-01-17T15:16:52.1745763Z'
+		)));
 		$verifier->verify(base64_encode(file_get_contents(__DIR__ . '/resources/response.xml')));
 	}
 
@@ -53,8 +54,9 @@ final class VerifierTest extends TestCase
 		$this->expectException(InvalidResponse::class);
 		$this->expectExceptionMessage('Response is not within specified timeframe');
 
-		$verifier = new Verifier('login.advania.is');
-		$verifier->setClock(Clock::fixed('2015-01-01T00:00:00Z00:00'));
+		$verifier = new Verifier('login.advania.is', new FrozenClock(new \DateTimeImmutable(
+			'2015-01-01T00:00:00Z0000'
+		)));
 		$verifier->verify(base64_encode(file_get_contents(__DIR__ . '/resources/response.xml')));
 	}
 
@@ -63,12 +65,13 @@ final class VerifierTest extends TestCase
 		$this->markTestSkipped('Don\'t have a valid response to test against');
 
 		$audienceUrl = '???';
-		$clock = Clock::fixed('2021-01-12T14:54:22.7537164Z');
+		$clock =  new FrozenClock(new \DateTimeImmutable(
+			'2021-01-12T14:54:22.7537164Z'
+		));
 		$userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88'
 			. ' Safari/537.36';
 
-		$verifier = new Verifier($audienceUrl);
-		$verifier->setClock($clock);
+		$verifier = new Verifier($audienceUrl, $clock);
 		$verifier->setUserAgent($userAgent);
 
 		$token = base64_encode(file_get_contents(__DIR__ . '/resources/valid_response.xml'));
@@ -81,11 +84,12 @@ final class VerifierTest extends TestCase
 		self::expectException(CertificateError::class);
 
 		$audienceUrl = 'login.advania.is';
-		$clock = Clock::fixed('2014-01-17T15:20:22.7537164Z');
+		$clock =  new FrozenClock(new \DateTimeImmutable(
+			'2014-01-17T15:20:22.7537164Z'
+		));
 		$userAgent = 'Mozilla/5.0 (Windows NT6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0';
 
-		$verifier = new Verifier($audienceUrl);
-		$verifier->setClock($clock);
+		$verifier = new Verifier($audienceUrl, $clock);
 		$verifier->setUserAgent($userAgent);
 
 		$token = base64_encode(file_get_contents(__DIR__ . '/resources/response-wrapping.xml'));

@@ -14,9 +14,8 @@ final class InvalidResponse extends \RuntimeException implements AuthenticateErr
 		return new self('Unable to get time from start (NotBefore) or end(NotOnOrAfter)');
 	}
 
-	public static function missingData(string $field): self
+	public static function missingData(string ...$fields): self
 	{
-		$fields = func_get_args();
 		if (count($fields) > 1) {
 			return new self(sprintf('Missing fields "%s" from response', implode('", "', $fields)));
 		}

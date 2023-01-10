@@ -6,11 +6,13 @@ use DOMNode;
 use DOMDocument;
 use DOMXPath;
 use Exception;
+use Islandis\Exception\AuthenticateError;
 use Islandis\Exception\CertificateError;
 use Islandis\Exception\InvalidResponse;
 use Islandis\Exception\ValidationFailure;
 use Islandis\Exception\XmlError;
 use phpseclib3\File\X509;
+use Psr\Clock\ClockInterface;
 use RobRichards\XMLSecLibs\XMLSecEnc;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
@@ -18,28 +20,20 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 final class Verifier
 {
 	const INTERMEDIATE_COMMON_NAME = 'Fullgilt audkenni';
-	/** @var DOMDocument|null */
-	private $xml;
-	/** @var string */
-	private $myCertPem;
-	/** @var string */
-	private $intermediateCert;
-	/** @var string */
-	private $audienceUrl;
-	/** @var Clock */
-	private $clock;
-	/** @var string */
-	private $userAgent;
-	/** @var XMLSecurityKey|null */
-	private $objKeyInfo;
-	/** @var XMLSecurityDSig */
-	private $objXMLSecDSig;
-	/** @var DOMNode */
-	private $objDSig;
 
-	public function __construct(string $audienceUrl, ?string $certificateDir = null)
-	{
-		$this->clock = Clock::live();
+	private ?DOMDocument $xml;
+	private string $myCertPem;
+	private string $intermediateCert;
+	private string $userAgent;
+	private ?XMLSecurityKey $objKeyInfo;
+	private XMLSecurityDSig $objXMLSecDSig;
+	private DOMNode $objDSig;
+
+	public function __construct(
+		private readonly string $audienceUrl,
+		private readonly ClockInterface $clock,
+		?string $certificateDir = null,
+	) {
 		if ($certificateDir === null) {
 			$certificateDir = $this->getDefaultCertificateFolder();
 		}
@@ -49,12 +43,6 @@ final class Verifier
 		if (!file_exists($this->intermediateCert)) {
 			throw CertificateError::notFoundInDirectory($certificateDir);
 		}
-		$this->audienceUrl = $audienceUrl;
-	}
-
-	public function setClock(Clock $clock): void
-	{
-		$this->clock = $clock;
 	}
 
 	public function setUserAgent(string $agent): void
@@ -62,6 +50,9 @@ final class Verifier
 		$this->userAgent = $agent;
 	}
 
+	/**
+	 * @throws AuthenticateError
+	 */
 	public function verify(string $token): bool
 	{
 		if (!$token) {
@@ -89,7 +80,7 @@ final class Verifier
 			'/assertion:AttributeValue',
 		]);
 
-		return $node ? $node->nodeValue : null;
+		return $node?->nodeValue;
 	}
 
 	private function getDefaultCertificateFolder(): string
@@ -130,7 +121,7 @@ final class Verifier
 		}
 	}
 
-	private function verifyDate(): bool
+	private function verifyDate(): void
 	{
 		/** @var \DOMElement|null $conditions */
 		$conditions = $this->queryDocument(['/protocol:Response', '/assertion:Assertion', '/assertion:Conditions']);
@@ -145,20 +136,16 @@ final class Verifier
 		}
 
 		date_default_timezone_set('Atlantic/Reykjavik');
-		$startTime = strtotime($start);
-		$endTime = strtotime($end);
-		if (!\is_int($startTime) || !\is_int($endTime)) {
-			throw InvalidResponse::dateInvalid();
-		}
-		$now = $this->clock->getTimestamp();
+		$startTime = new \DateTimeImmutable($start);
+		$endTime = new \DateTimeImmutable($end);
+		$now = $this->clock->now();
 		$inSpan = $startTime < $now && $now < $endTime;
 		if (!$inSpan) {
 			throw InvalidResponse::notWithinTimeframe();
 		}
-		return true;
 	}
 
-	private function verifyCertificate(): bool
+	private function verifyCertificate(): void
 	{
 		if (!$this->objKeyInfo) {
 			throw ValidationFailure::keyInfoNotFound();
@@ -172,7 +159,7 @@ final class Verifier
 		}
 
 		date_default_timezone_set('Atlantic/Reykjavik');
-		if (!$leaf->validateDate($this->clock->getDateTime())) {
+		if (!$leaf->validateDate($this->clock->now())) {
 			throw CertificateError::expired();
 		}
 
@@ -187,11 +174,9 @@ final class Verifier
 		if (!$leaf->validateSignature()) {
 			throw CertificateError::signatureInvalid();
 		}
-
-		return true;
 	}
 
-	private function verifyAudience(): bool
+	private function verifyAudience(): void
 	{
 		$audience = $this->queryDocument([
 			'/protocol:Response',
@@ -204,8 +189,6 @@ final class Verifier
 		if (!$audience || $audience->textContent !== $this->audienceUrl) {
 			throw ValidationFailure::invalidAudience($audience ? $audience->textContent : '', $this->audienceUrl);
 		}
-
-		return true;
 	}
 
 	private function verifySignature(): void
@@ -214,12 +197,11 @@ final class Verifier
 		if (!$objKey) {
 			throw ValidationFailure::keyNotFound();
 		}
-		$key = null;
 		$this->objKeyInfo = XMLSecEnc::staticLocateKeyInfo($objKey, $this->objDSig);
 		if (!$this->objKeyInfo) {
 			throw ValidationFailure::keyInfoNotFound();
 		}
-		if (!$this->objKeyInfo->key && empty($key)) {
+		if (!$this->objKeyInfo->key) {
 			$objKey->loadKey($this->myCertPem, true);
 		}
 		if (!$this->objXMLSecDSig->verify($objKey)) {
