@@ -6,13 +6,9 @@ use Islandis\Exception\AuthenticateError;
 
 class Authenticate
 {
-	/** @var Verifier */
-	private $verifier;
-
-	public function __construct(Verifier $verifier)
-	{
-		$this->verifier = $verifier;
-	}
+	public function __construct(
+		private readonly Verifier $verifier,
+	) {}
 
 	/**
 	 * @throws AuthenticateError

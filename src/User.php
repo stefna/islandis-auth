@@ -4,27 +4,6 @@ namespace Islandis;
 
 class User
 {
-	/** @var string */
-	private $name;
-	/** @var string */
-	private $ssn;
-	/** @var string */
-	private $authMethod;
-	/** @var string */
-	private $ip;
-	/** @var string */
-	private $ua;
-	/** @var string */
-	private $legalEntitySsn;
-	/** @var string */
-	private $legalEntityName;
-	/** @var string */
-	private $destinationSsn;
-	/** @var string */
-	private $authId;
-	/** @var string */
-	private $mobile;
-
 	public static function fromVerifier(Verifier $verifier): self
 	{
 		return new self(
@@ -42,28 +21,17 @@ class User
 	}
 
 	public function __construct(
-		string $name,
-		string $ssn,
-		string $authMethod,
-		string $ip,
-		string $ua,
-		string $legalEntitySsn,
-		string $legalEntityName,
-		string $destinationSsn,
-		string $authId,
-		string $mobile
-	) {
-		$this->name = $name;
-		$this->ssn = $ssn;
-		$this->authMethod = $authMethod;
-		$this->ip = $ip;
-		$this->ua = $ua;
-		$this->legalEntitySsn = $legalEntitySsn;
-		$this->legalEntityName = $legalEntityName;
-		$this->destinationSsn = $destinationSsn;
-		$this->authId = $authId;
-		$this->mobile = $mobile;
-	}
+		public readonly string $name,
+		public readonly string $ssn,
+		public readonly string $authenticationMethod,
+		public readonly string $ip,
+		public readonly string $ua,
+		public readonly string $legalEntitySsn,
+		public readonly string $legalEntityName,
+		public readonly string $destinationSsn,
+		public readonly string $authId,
+		public readonly string $mobile
+	) {}
 
 	public function getName(): string
 	{
@@ -73,45 +41,5 @@ class User
 	public function getKennitala(): string
 	{
 		return $this->ssn;
-	}
-
-	public function getAuthenticationMethod(): string
-	{
-		return $this->authMethod;
-	}
-
-	public function getUserIp(): string
-	{
-		return $this->ip;
-	}
-
-	public function getUserAgent(): string
-	{
-		return $this->ua;
-	}
-
-	public function getLegalEntityKennitala(): string
-	{
-		return $this->legalEntitySsn;
-	}
-
-	public function getLegalEntityName(): string
-	{
-		return $this->legalEntityName;
-	}
-
-	public function getDestinationSsn(): string
-	{
-		return $this->destinationSsn;
-	}
-
-	public function getAuthId(): string
-	{
-		return $this->authId;
-	}
-
-	public function getMobile(): string
-	{
-		return $this->mobile;
 	}
 }

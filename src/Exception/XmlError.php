@@ -19,10 +19,7 @@ final class XmlError extends \DomainException implements ResponseError
 		return new self('No xml loaded to read from');
 	}
 
-	/**
-	 * @param \LibXMLError|false $error
-	 */
-	public static function libXML($error): self
+	public static function libXML(false|\LibXMLError $error): self
 	{
 		return new self($error ? $error->message : 'Unknown error while parsing xml');
 	}
