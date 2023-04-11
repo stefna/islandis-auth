@@ -4,7 +4,7 @@ namespace Islandis;
 
 class User
 {
-	public static function fromVerifier(Verifier $verifier): self
+	public static function fromVerifier(VerifierInterface $verifier): self
 	{
 		return new self(
 			(string)$verifier->getAttribute('Name'),
