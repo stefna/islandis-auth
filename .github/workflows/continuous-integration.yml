@@ -15,6 +15,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        dependencies:
+          - "lowest"
+          - "highest"
         php-version:
           - "8.1"
           - "8.2"
@@ -24,6 +27,7 @@ jobs:
           - php-version: "8.3"
             composer-options: "--ignore-platform-reqs"
             experimental: true
+            dependencies: "highest"
 
     steps:
       - name: "Checkout"
@@ -35,19 +39,13 @@ jobs:
           coverage: "none"
           php-version: "${{ matrix.php-version }}"
 
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: "Install lowest dependencies"
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: "composer update --prefer-lowest ${{ env.COMPOSER_FLAGS }} ${{ matrix.composer-options }}"
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-
-      - name: "Install latest dependencies"
+      - name: "Install highest dependencies"
+        if: ${{ matrix.dependencies == 'highest' }}
         run: "composer update ${{ env.COMPOSER_FLAGS }} ${{ matrix.composer-options }}"
 
       - name: "Run tests"
-        run: ./vendor/bin/phpunit -c phpunit.xml.dist
+        run: "./vendor/bin/phpunit -c phpunit.xml.dist"
