@@ -2,7 +2,6 @@
 
 namespace Islandis\Tests;
 
-use Islandis\Clock;
 use Islandis\Exception\CertificateError;
 use Islandis\Exception\InvalidResponse;
 use Islandis\Exception\ValidationFailure;
