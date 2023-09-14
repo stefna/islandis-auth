@@ -101,7 +101,7 @@ final class Verifier
 
 	private function getUserAgent(): string
 	{
-		if ($this->userAgent) {
+		if (isset($this->userAgent)) {
 			return $this->userAgent;
 		}
 

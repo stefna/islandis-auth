@@ -95,4 +95,16 @@ final class VerifierTest extends TestCase
 
 		$verifier->verify($token);
 	}
+
+	public function testGetUserAgentFallback(): void
+	{
+		$this->expectException(ValidationFailure::class);
+		$this->expectExceptionMessage('User-agent does not match');
+		$audienceUrl = 'login.advania.is';
+		$clock =  new FrozenClock(new \DateTimeImmutable(
+			'2014-01-17T15:20:22.7537164Z'
+		));
+		$verifier = new Verifier($audienceUrl, $clock);
+		$verifier->verify(base64_encode(file_get_contents(__DIR__ . '/resources/response.xml')));
+	}
 }
