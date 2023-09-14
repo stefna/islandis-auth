@@ -7,7 +7,7 @@ use Islandis\Exception\AuthenticateError;
 class Authenticate
 {
 	public function __construct(
-		private readonly Verifier $verifier,
+		private readonly VerifierInterface $verifier,
 	) {}
 
 	/**
@@ -18,5 +18,10 @@ class Authenticate
 		$this->verifier->verify($token);
 
 		return User::fromVerifier($this->verifier);
+	}
+
+	public function getAuthId(): ?string
+	{
+		return $this->verifier->getAttribute('AuthID');
 	}
 }

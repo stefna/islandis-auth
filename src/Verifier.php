@@ -17,9 +17,9 @@ use RobRichards\XMLSecLibs\XMLSecEnc;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
-final class Verifier
+final class Verifier implements VerifierInterface
 {
-	const INTERMEDIATE_COMMON_NAME = 'Fullgilt audkenni';
+	private const INTERMEDIATE_COMMON_NAME = 'Fullgilt audkenni';
 
 	private ?DOMDocument $xml;
 	private string $myCertPem;
