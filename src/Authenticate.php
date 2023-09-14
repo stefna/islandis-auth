@@ -19,4 +19,9 @@ class Authenticate
 
 		return User::fromVerifier($this->verifier);
 	}
+
+	public function getAuthId(): ?string
+	{
+		return $this->verifier->getAttribute('AuthID');
+	}
 }
