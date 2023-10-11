@@ -9,9 +9,9 @@ final class ValidationFailure extends \DomainException implements AuthenticateEr
 		return new self('Reference Validation Failed', 1, $e);
 	}
 
-	public static function userAgent(): self
+	public static function userAgent(string $userAgent, string $expected): self
 	{
-		return new self('User-agent does not match');
+		return new self(sprintf('User-agent does not match "%s" got "%s"', $expected, $userAgent));
 	}
 
 	public static function ip(): self

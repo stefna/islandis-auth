@@ -115,9 +115,11 @@ final class Verifier implements VerifierInterface
 
 	private function verifyUserAgent(): void
 	{
-		// todo throw on missing useragent
-		if ($this->getAttribute('UserAgent') !== $this->getUserAgent()) {
-			throw ValidationFailure::userAgent();
+		$userAgent = $this->getUserAgent();
+		$expected = $this->getAttribute('UserAgent');
+
+		if ($expected !== $userAgent) {
+			throw ValidationFailure::userAgent($userAgent, $expected);
 		}
 	}
 
